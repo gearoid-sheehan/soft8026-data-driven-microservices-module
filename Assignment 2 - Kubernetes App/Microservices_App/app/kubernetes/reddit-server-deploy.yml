@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reddit-server-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: reddit-server
+  minReadySeconds: 6
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: reddit-server
+    spec:
+      containers:
+      - name: reddit-server
+        image: gearoidsheehan/reddit_server:latest
+        ports:
+        - containerPort: 50051

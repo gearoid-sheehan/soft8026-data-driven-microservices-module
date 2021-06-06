@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reddit-client-deploy
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: reddit-client
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: reddit-client
+    spec:
+      containers:
+      - name: reddit-client
+        image: gearoidsheehan/reddit_client:latest

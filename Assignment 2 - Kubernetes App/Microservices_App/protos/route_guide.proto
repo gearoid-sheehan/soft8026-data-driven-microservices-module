@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package app;
+
+service RouteGuide {
+
+  rpc SendRedditPost (PostRequestReddit) returns (stream GetRedditPost) {}
+  rpc SendYouTubePost (PostRequestYoutube) returns (stream GetYouTubePost) {}
+}
+
+message PostRequestReddit {
+  string response = 1;
+}
+
+message PostRequestYoutube {
+  string response = 1;
+}
+
+message GetRedditPost {
+  string id = 1;
+  string title = 2;
+  string score = 3;
+  string author = 4;
+  string author_flair_text = 5;
+  string removed_by = 6;
+  string total_awards_received = 7;
+  string awarders = 8;
+  string created_utc = 9;
+  string full_link = 10;
+  string num_comments = 11;
+  string over_18 = 12;
+}
+
+message GetYouTubePost {
+  string video_id = 1;
+  string trending_date = 2;
+  string title = 3;
+  string channel_title = 4;
+  string category_id = 5;
+  string publish_time = 6;
+  string tags = 7;
+  string views = 8;
+  string likes = 9;
+  string dislikes = 10;
+  string comment_count = 11;
+  string thumbnail_link = 12;
+  string comments_disabled = 13;
+  string ratings_disabled = 14;
+  string video_error_or_removed = 15;
+  string description = 16;
+}

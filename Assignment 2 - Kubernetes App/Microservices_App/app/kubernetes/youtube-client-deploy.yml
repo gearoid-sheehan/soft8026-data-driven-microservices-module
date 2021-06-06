@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: youtube-client-deploy
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: youtube-client
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: youtube-client
+    spec:
+      containers:
+      - name: youtube-client
+        image: gearoidsheehan/youtube_client:latest

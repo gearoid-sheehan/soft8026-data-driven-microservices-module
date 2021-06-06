@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reddit Data App</title>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+   <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> 
+
+  <link rel="shortcut icon" href="../static/images/logo.png">
+
+</head>
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style="z-index: 999; background-color:  #c02f2f;">
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <a class="navbar-brand" routerLink="/" style="color: whitesmoke; padding-left: 10px;">Reddit Data App</a>
+        </div>
+        <div class="col-10">
+        </div>
+      </div>
+    </div>
+</nav>
+
+<div class="container fluid">
+  <div class="row">
+    <div class="col">
+      <div id="chartContainer" style="height: 400px; width:50%;"></div>
+    </div>
+    <div class="col">
+      <div id="inc_data" style="width: 600px; height: 400px; overflow: scroll;">
+        <h1>
+          Incoming Data <br>
+        </h1>{{x}}</div>
+    </div>
+  </div>
+  </div>
+</body>
+
+  <script type="text/javascript">
+
+  window.onload = function () {
+
+    var dps = []; // dataPoints
+    var chart = new CanvasJS.Chart("chartContainer", {
+      title :{
+        text: "Avg. Number of Comments"
+      },
+      data: [{
+        type: "line",
+        dataPoints: dps
+      }]
+    });
+
+    var xVal = 0;
+    var yVal = 100; 
+    var updateInterval = 2000;
+    var dataLength = 20; // number of dataPoints visible at any point
+
+    function extractContent(s) {
+      var span = document.createElement('span');
+      span.innerHTML = s;
+      return span.textContent || span.innerText;
+    };
+
+      $(function(){
+        window.setInterval(function(){
+          loadNewData()
+        }, 2000)
+
+      function loadNewData() {
+        $.ajax({
+          url:"/update_data",
+          type: "POST",
+          dataType: "json",
+          success: function(data){
+            $(inc_data).replaceWith(data);
+
+            var array = extractContent(data[1]).split('//');
+
+            console.log(array)
+            
+            var postTitle = array[2];
+
+            var updateChart = function (count) {
+
+              count = count || 1;
+
+              for (var j = 0; j < count; j++) {
+                yVal = parseFloat(array[1])
+                
+                dps.push({
+                  x: xVal,
+                  y: yVal
+                });
+
+                xVal = xVal + 1
+              }
+
+              if (dps.length > dataLength) {
+                dps.shift();
+              }
+
+              chart.render();
+              };
+
+              updateChart(dataLength);
+              setInterval(function(){updateChart()}, updateInterval);
+          
+          }
+        });
+      }
+    });
+  }
+  </script>
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</html>

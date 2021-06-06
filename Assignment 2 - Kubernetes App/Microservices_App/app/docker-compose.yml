@@ -1,0 +1,59 @@
+version: '3'
+services:
+
+  #---- REDDIT SERVER ----
+  reddit-server:
+    build:
+      context: .
+      dockerfile: server/reddit_server/RedditServer.Dockerfile
+    ports: 
+      - "50051:50051"
+
+  #---- REDDIT CLIENT ----
+  reddit-client:
+    build:
+      context: .
+      dockerfile: client/reddit_client/RedditClient.Dockerfile
+    depends_on:
+      - "reddit-server"
+    command: ["./wait-for-it.sh", "reddit-server:50051", "--", "python", "client/reddit_client/reddit_client.py"]
+
+  #---- YOUTUBE SERVER ----
+  youtube-server:
+    build:
+      context: .
+      dockerfile: server/youtube_server/YoutubeServer.Dockerfile
+    ports: 
+      - "50052:50052"
+
+  #---- YOUTUBE CLIENT ----
+  youtube-client:
+    build:
+      context: .
+      dockerfile: client/youtube_client/YoutubeClient.Dockerfile
+    depends_on:
+      - "youtube-server"
+    command: ["./wait-for-it.sh", "youtube-server:50052", "--", "python", "client/youtube_client/youtube_client.py"]
+
+  #---- FLASK APPLICATION ----
+  weblogs:
+    build:
+      context: .
+      dockerfile: weblogs/Weblogs.Dockerfile
+    ports:
+      - "8080:5000"
+    depends_on:
+      - "mongodb-container"
+
+  #---- MONGODB ----
+  mongodb-container:
+    image: mongo:latest
+    hostname: test-mongodb
+    environment:
+      - MONGO_INITDB_DATABASE=analytics_db
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=pass
+    volumes:
+      - ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
+    ports:
+      - 27017:27017

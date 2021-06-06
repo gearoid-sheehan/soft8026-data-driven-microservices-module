@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weblogs-deploy
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: weblogs
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: weblogs
+    spec:
+      containers:
+      - name: weblogs
+        image: gearoidsheehan/weblogs:latest
+        ports:
+        - containerPort: 5000

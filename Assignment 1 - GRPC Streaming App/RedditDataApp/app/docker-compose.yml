@@ -1,0 +1,28 @@
+version: '3'
+services:
+  redditserver:
+    build:
+      context: .
+      dockerfile: server/Server.Dockerfile
+    ports: 
+      - "50051:50051"
+  redditclient:
+    build:
+      context: .
+      dockerfile: client/Client.Dockerfile
+    depends_on:
+      - "redditserver"
+    command: ["./wait-for-it.sh", "redditserver:50051", "--", "python", "client/reddit_client.py"]
+  redis:
+    image: redis:alpine
+    ports: 
+      - "6379:6379"
+  weblogs:
+    build:
+      context: .
+      dockerfile: webserver/Weblog.Dockerfile
+    ports:
+      - "8080:5000"
+    depends_on:
+      - "redis"
+
